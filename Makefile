@@ -11,3 +11,7 @@ update_charmstack:
 	for p in wish lipgloss bubbletea bubbles log; do \
 		go get charm.land/$$p/v2; \
 	done
+
+.PHONY: update_gotty
+update_gotty:
+	go get github.com/ghthor/gotty/v2@master

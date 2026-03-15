@@ -12,7 +12,7 @@ require (
 	github.com/charmbracelet/ssh v0.0.0-20250826160808-ebfa259c7309
 	github.com/charmbracelet/x/ansi v0.11.6
 	github.com/creack/pty v1.1.24
-	github.com/ghthor/gotty/v2 v2.3.5-0.20251029005134-cd3de2cfa4f6
+	github.com/ghthor/gotty/v2 v2.3.5-0.20260315200743-5b3b887a6ecd
 	github.com/golang-cz/ringbuf v0.0.5
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/stretchr/testify v1.11.1
