@@ -1,6 +1,6 @@
 .PHONY: go.work
 go.work:
-	rm go.work*
+	rm -f go.work*
 	go work init
 	go work use ./gotty
 	go work use ./
