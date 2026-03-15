@@ -20,7 +20,7 @@ pkgs.mkShell {
       entr
 
       # go
-      pkgs-unstable.go # go 1.25
+      pkgs-unstable.go_1_26 # go 1.26
       gopls
       gotools
       gotestsum

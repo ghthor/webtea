@@ -11,18 +11,18 @@
     #   - Ex: slightly newer to pick up a patch
 
     #### Main stable release branch
-    # https://hydra.nixos.org/jobset/nixos/release-25.05/evals
+    # https://hydra.nixos.org/jobset/nixos/release-25.11/evals
     nixpkgs = {
-      # https://hydra.nixos.org/eval/1819210#tabs-inputs
-      url = "github:NixOS/nixpkgs/5da4a26309e796daa7ffca72df93dbe53b8164c7";
+      # https://hydra.nixos.org/eval/1823025#tabs-inputs
+      url = "github:NixOS/nixpkgs/c217913993d6c6f6805c3b1a3bda5e639adfde6d";
       # url = "nixpkgs/nixos-25.05";
     };
 
     #### Unstable release branch
     # https://hydra.nixos.org/jobset/nixos/trunk-combined
     nixpkgs-unstable = {
-      # https://hydra.nixos.org/eval/1819564#tabs-inputs
-      url = "github:NixOS/nixpkgs/01f116e4df6a15f4ccdffb1bcd41096869fb385c";
+      # https://hydra.nixos.org/eval/1823263#tabs-inputs
+      url = "github:NixOS/nixpkgs/cf59864ef8aa2e178cccedbe2c178185b0365705";
       # url = "nixpkgs/nixos-unstable";
     };
 
