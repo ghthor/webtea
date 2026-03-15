@@ -8,7 +8,8 @@ import (
 	"testing"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/ghthor/webtea/mpty"
 	"github.com/ghthor/webtea/mpty/mptymsg"
 	"github.com/stretchr/testify/require"
@@ -61,7 +62,13 @@ func TestClient(t *testing.T) {
 			Msg{Str: "hi3"}.SetNick(SysNick + "123"),
 			Msg{Str: "hi2"}.SetNick(SysNick + "12"),
 		})
-		p.Send(tea.KeyMsg{Type: tea.KeyCtrlC})
+		ctrlC := tea.Key{
+			Mod:  tea.ModCtrl,
+			Code: 'c',
+		}
+		p.Send(tea.KeyMsg(
+			tea.KeyPressMsg(ctrlC),
+		))
 
 		p.Quit()
 		require.NoError(t, grp.Wait())
@@ -70,12 +77,12 @@ func TestClient(t *testing.T) {
 		expectedFile := filepath.Join(testdataDir, t.Name())
 
 		if enableGen {
-			require.NoError(t, os.WriteFile(expectedFile, []byte(got), 0644))
+			require.NoError(t, os.WriteFile(expectedFile, []byte(ansi.Strip(got.Content)), 0644))
 		}
 
 		expected, err := os.ReadFile(expectedFile)
 		require.NoError(t, err)
 
-		require.Equal(t, string(expected), got)
+		require.Equal(t, string(expected), ansi.Strip(got.Content))
 	})
 }

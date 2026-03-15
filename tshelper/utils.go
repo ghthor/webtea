@@ -8,7 +8,7 @@ import (
 	"net/netip"
 	"time"
 
-	"github.com/charmbracelet/log"
+	"charm.land/log/v2"
 	"tailscale.com/client/local"
 	"tailscale.com/tsnet"
 )

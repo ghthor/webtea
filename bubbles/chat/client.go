@@ -7,18 +7,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/bubbles/textinput"
-	"github.com/charmbracelet/bubbles/viewport"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
-	"github.com/charmbracelet/log"
+	"charm.land/bubbles/v2/textinput"
+	"charm.land/bubbles/v2/viewport"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
+	"charm.land/lipgloss/v2/table"
+	"charm.land/log/v2"
 	"github.com/ghthor/webtea/bubbles/blokfall"
 	"github.com/ghthor/webtea/mpty"
 	"github.com/ghthor/webtea/mpty/mptymsg"
-	"github.com/ghthor/webtea/teamodel"
 	"github.com/ghthor/webtea/unsafering"
-	overlay "github.com/rmhubbert/bubbletea-overlay"
 )
 
 type ChatSizeMsg struct {
@@ -30,7 +28,7 @@ var (
 	None       = lipgloss.NewStyle()
 	AlignRight = lipgloss.NewStyle().Align(lipgloss.Right)
 
-	StyleZeroWidth = lipgloss.NewStyle().Width(0).MaxWidth(0)
+	StyleZeroWidth = lipgloss.NewStyle().Padding(0).Margin(0).Width(0).MaxWidth(0)
 
 	StyleDebugCol = lipgloss.NewStyle().
 			MarginRight(1)
@@ -52,8 +50,11 @@ var (
 
 	StyleNick = lipgloss.NewStyle().
 			Align(lipgloss.Right).
+			Margin(0).
 			MarginRight(1).
+			Padding(0).
 			PaddingRight(1).
+			PaddingLeft(0).
 			Border(VertLine, false).
 			BorderRight(true)
 
@@ -61,7 +62,9 @@ var (
 
 	StyleMsgCol = lipgloss.NewStyle().
 			Align(lipgloss.Left).
-			PaddingLeft(1).
+			Margin(0).
+			Padding(0).
+			PaddingLeft(0).
 			PaddingRight(1)
 	StyleSysMsg = StyleMsgCol.Faint(true)
 )
@@ -129,8 +132,6 @@ type Client struct {
 
 	blokfallView      blokfall.MPView
 	blokfallConnected bool
-
-	overlay *overlay.Model
 
 	quiet         bool
 	showTimestamp bool
@@ -221,7 +222,7 @@ func (m *Client) styleFunc(row, col int) lipgloss.Style {
 			s = StyleSysNick
 		}
 		// return s
-		width := m.chatData.nickWidth + 1 + 1 // padding + border
+		width := m.chatData.nickWidth + 1 + 1 + 1 // padding + border
 		return s.
 			Width(width)
 
@@ -239,7 +240,7 @@ func (m *Client) styleFunc(row, col int) lipgloss.Style {
 }
 
 func (m *Client) setTableOffset() {
-	m.table.Offset(max(0, m.chatData.Len()-m.ChatViewHeight()-1))
+	m.table.YOffset(max(0, m.chatData.Len()-m.ChatViewHeight()-1))
 }
 
 func (m *Client) Init() tea.Cmd {
@@ -269,9 +270,10 @@ func (m *Client) Init() tea.Cmd {
 		Data(m).
 		StyleFunc(m.styleFunc)
 
-	m.view = viewport.New(m.Width, m.ChatViewHeight())
-
-	m.overlay = overlay.New(nil, nil, overlay.Right, overlay.Center, -10, 0)
+	m.view = viewport.New(
+		viewport.WithWidth(m.Width),
+		viewport.WithHeight(m.ChatViewHeight()),
+	)
 
 	return tea.Batch(m.cmdLine.Focus())
 }
@@ -402,12 +404,14 @@ func (m *Client) updateBlokFall(msg tea.Msg) tea.Cmd {
 
 }
 
-func (m *Client) View() string {
+func (m *Client) View() tea.View {
 	b := &m.b
 	b.Reset()
 
 	m.ViewTo(b)
-	return b.String()
+	return tea.View{
+		Content: b.String(),
+	}
 }
 
 func (m *Client) ViewTo(w io.Writer) {
@@ -419,14 +423,28 @@ func (m *Client) ViewTo(w io.Writer) {
 	v := m.view.View()
 
 	if m.blokfallView != nil {
-		v = lipgloss.Place(
+		chatView := lipgloss.Place(
 			m.Width, m.ChatViewHeight(),
 			lipgloss.Left, lipgloss.Bottom,
 			v,
 		)
-		m.overlay.Foreground = teamodel.String(*m.blokfallView)
-		m.overlay.Background = teamodel.String(v)
-		fmt.Fprintln(w, m.overlay.View())
+
+		blokView := *m.blokfallView
+		const xOffset = 10
+		// horz => right with 10 margin on the right
+		x := max(0, m.Width-lipgloss.Width(blokView)-xOffset)
+		// vert => centered
+		y := max(0, (m.ChatViewHeight()-lipgloss.Height(blokView))/2)
+
+		// TODO: the compositor is destructive instead of what I was hoping
+		// which was additive. Meaning the blockfall view occludes the chat
+		comp := lipgloss.NewCompositor(
+			lipgloss.NewLayer(chatView).X(0).Y(0).Z(0),
+			lipgloss.NewLayer(blokView).X(x).Y(y).Z(1),
+		)
+		comp.Render()
+
+		fmt.Fprintln(w, comp.Render())
 	} else {
 		fmt.Fprintln(w, v)
 	}
@@ -443,15 +461,15 @@ func (m *Client) SetSize(w, h int) {
 	m.Width = w
 	m.Height = h
 	m.table.Width(w)
-	m.cmdLine.Width = w
+	m.cmdLine.SetWidth(w)
 
 	m.viewportResize()
 	m.setTableOffset()
 }
 
 func (m *Client) viewportResize() {
-	m.view.Height = m.ChatViewHeight()
-	m.view.Width = m.Width
+	m.view.SetHeight(m.ChatViewHeight())
+	m.view.SetWidth(m.Width)
 }
 
 func (m *Client) updateSuggestions(msg tea.Msg) {

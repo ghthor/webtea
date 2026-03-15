@@ -15,12 +15,12 @@ import (
 	"syscall"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/log"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
+	"charm.land/log/v2"
+	"charm.land/wish/v2"
+	"charm.land/wish/v2/logging"
 	"github.com/charmbracelet/ssh"
-	"github.com/charmbracelet/wish"
-	"github.com/charmbracelet/wish/logging"
 	"github.com/ghthor/webtea"
 	"github.com/ghthor/webtea/mpty"
 	"github.com/ghthor/webtea/tshelper"
@@ -124,7 +124,6 @@ func newProg(ctx context.Context, m mpty.ClientModel, opts ...tea.ProgramOption)
 	opts = append(opts,
 		tea.WithContext(ctx),
 		tea.WithoutSignalHandler(),
-		tea.WithAltScreen(),
 	)
 	p := tea.NewProgram(m, opts...)
 	go func() {
@@ -188,7 +187,7 @@ func (m *model) UpdateClient(msg tea.Msg) (mpty.ClientModel, tea.Cmd) {
 
 var bold = lipgloss.NewStyle().Bold(true)
 
-func (m *model) View() string {
+func (m *model) View() tea.View {
 	b := &m.b
 	b.Reset()
 	fmt.Fprintf(b, " term: %s\n", m.term)
@@ -204,7 +203,10 @@ func (m *model) View() string {
 
 	fmt.Fprintln(b, "\n[q]uit")
 
-	return b.String()
+	return tea.View{
+		Content:   b.String(),
+		AltScreen: true,
+	}
 }
 
 func (m *model) Err() error {

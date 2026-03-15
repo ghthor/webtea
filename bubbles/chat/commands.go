@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 type Cmd struct {
@@ -136,7 +136,7 @@ Type out a message and press <enter> or use a command
 
 	fmt.Fprint(&b, `
 -> For input key mappings see:
-  - https://github.com/charmbracelet/bubbles/blob/v0.21.0/textinput/textinput.go#L68
+  - https://github.com/charmbracelet/bubbles/blob/v2.0.0/textinput/textinput.go#L68
 `)
 
 	return b.String()

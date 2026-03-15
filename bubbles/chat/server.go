@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/log"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/log/v2"
 	"github.com/ghthor/webtea/bubbles/blokfall"
 	"github.com/ghthor/webtea/mpty"
 	"github.com/golang-cz/ringbuf"
@@ -122,8 +122,8 @@ func (m *ServerModel) UpdateBlokFall(msg tea.Msg) tea.Cmd {
 	return cmd
 }
 
-func (m *ServerModel) View() string {
-	return ""
+func (m *ServerModel) View() tea.View {
+	return tea.View{}
 }
 
 func FormatTimeAsAge(t time.Time, now time.Time) string {

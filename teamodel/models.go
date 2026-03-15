@@ -1,7 +1,7 @@
 package teamodel
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 type String string
@@ -14,12 +14,12 @@ func (m String) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m String) View() string {
-	return string(m)
+func (m String) View() tea.View {
+	return tea.View{Content: string(m)}
 }
 
 type ReadonlyView interface {
-	View() string
+	View() tea.View
 }
 
 type Readonly struct {

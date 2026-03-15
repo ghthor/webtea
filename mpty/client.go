@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/ssh"
 	"tailscale.com/client/tailscale/apitype"
 )
@@ -31,6 +31,8 @@ type ClientInfoModel struct {
 	Sess Session
 	Who  *apitype.WhoIsResponse
 }
+
+var _ tea.Model = &ClientInfoModel{}
 
 func NewClientInfoModelFromSsh(pty ssh.Pty, sess Session, who *apitype.WhoIsResponse) *ClientInfoModel {
 	return &ClientInfoModel{
@@ -82,7 +84,7 @@ func (m *ClientInfoModel) UpdateInfo(msg tea.Msg) (*ClientInfoModel, tea.Cmd) {
 	return m, nil
 }
 
-func (m *ClientInfoModel) View() string {
+func (m *ClientInfoModel) View() tea.View {
 	b := &m.b
 	b.Reset()
 	fmt.Fprintf(b, "  who: %s\n", m.Who.UserProfile.LoginName)
@@ -91,7 +93,9 @@ func (m *ClientInfoModel) View() string {
 	fmt.Fprintf(b, " size: (%d,%d)\n", m.Width, m.Height)
 	fmt.Fprintf(b, " time: %s\n", Bold.Render(m.Time.Format(time.RFC1123)))
 
-	return b.String()
+	return tea.View{
+		Content: b.String(),
+	}
 }
 
 func (m *ClientInfoModel) ViewHeight() int {

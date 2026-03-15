@@ -7,18 +7,17 @@ import (
 	"os"
 	"time"
 
+	tea "charm.land/bubbletea/v2"
+	"charm.land/log/v2"
+	"charm.land/wish/v2"
+	"charm.land/wish/v2/bubbletea"
 	"github.com/cenkalti/backoff/v5"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/log"
 	"github.com/charmbracelet/ssh"
-	"github.com/charmbracelet/wish"
-	"github.com/charmbracelet/wish/bubbletea"
 	"github.com/creack/pty"
 	"github.com/ghthor/gotty/v2/server"
 	"github.com/ghthor/webtea/ctxhelp"
 	"github.com/ghthor/webtea/mpty"
 	"github.com/gorilla/websocket"
-	"github.com/muesli/termenv"
 	"golang.org/x/sync/errgroup"
 	"tailscale.com/client/local"
 	"tailscale.com/client/tailscale/apitype"
@@ -46,7 +45,7 @@ func WishMiddleware(ctx context.Context, lc *local.Client, newModel NewSshModel,
 		)
 		return newProg(progCtx, m, bubbletea.MakeOptions(s)...)
 	}
-	return bubbletea.MiddlewareWithProgramHandler(teaHandler, termenv.ANSI256)
+	return bubbletea.MiddlewareWithProgramHandler(teaHandler)
 }
 
 type TeaTYFactory struct {

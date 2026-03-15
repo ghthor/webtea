@@ -18,11 +18,11 @@ import (
 	"syscall"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/log"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/log/v2"
+	"charm.land/wish/v2"
+	"charm.land/wish/v2/logging"
 	"github.com/charmbracelet/ssh"
-	"github.com/charmbracelet/wish"
-	"github.com/charmbracelet/wish/logging"
 	"github.com/ghthor/webtea"
 	"github.com/ghthor/webtea/bubbles/chat"
 	"github.com/ghthor/webtea/mpty"
@@ -203,15 +203,20 @@ func (m *Model) UpdateClient(msg tea.Msg) (mpty.ClientModel, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m *Model) View() string {
+func (m *Model) View() tea.View {
 	b := &m.b
 	b.Reset()
 
 	// TODO: maybe make this an overlay?
-	fmt.Fprint(b, m.ClientInfoModel.View())
+	if m.showInfo {
+		fmt.Fprint(b, m.ClientInfoModel.View().Content)
+	}
 	m.chat.ViewTo(b)
 
-	return b.String()
+	return tea.View{
+		Content:   b.String(),
+		AltScreen: true,
+	}
 }
 
 func (m *Model) setChatSize() {

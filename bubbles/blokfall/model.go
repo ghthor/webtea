@@ -10,9 +10,9 @@ import (
 	"text/tabwriter"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
+	"charm.land/lipgloss/v2/table"
 	"github.com/ghthor/webtea/unsafering"
 )
 
@@ -133,7 +133,7 @@ const (
 	RotateCWMsg  Input = "k"
 	LeftMsg      Input = "d"
 	RightMsg     Input = "f"
-	HardDownMsg  Input = " "
+	HardDownMsg  Input = "space"
 	SoftDownMsg  Input = "g"
 )
 
@@ -383,9 +383,11 @@ func (m *Model) NewLock(i int) tea.Cmd {
 	return NewLock(GravityByLevel(m.level), i, tick)
 }
 
-func (m *Model) View() string {
+func (m *Model) View() tea.View {
+	v := tea.View{}
 	if !m.render {
-		return m.b.String()
+		v.Content = m.b.String()
+		return v
 	}
 
 	m.b.Reset()
@@ -407,7 +409,9 @@ func (m *Model) View() string {
 	m.render = false
 	m.table.Data(m.tableView)
 	m.b.WriteString(m.table.Render())
-	return m.b.String()
+
+	v.Content = m.b.String()
+	return v
 }
 
 func (m *Model) ViewNextPiecesTo(w io.Writer) {

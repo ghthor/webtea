@@ -6,8 +6,8 @@ import (
 	"errors"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/log"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/log/v2"
 	"github.com/ghthor/webtea/mpty/mptymsg"
 	"github.com/golang-cz/ringbuf"
 	"golang.org/x/sync/errgroup"
@@ -326,7 +326,6 @@ func (p Program) NewClientProgram() NewClientProgram {
 		opts = append(opts,
 			tea.WithContext(ctx),
 			tea.WithoutSignalHandler(),
-			tea.WithAltScreen(),
 		)
 
 		respCh := make(chan subResp, 1)

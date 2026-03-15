@@ -1,8 +1,8 @@
 package blokfall
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 	"github.com/ghthor/webtea/mpty"
 	"github.com/golang-cz/ringbuf"
 )
@@ -36,8 +36,8 @@ func (m *MPModel) Init() tea.Cmd {
 
 func (m *MPModel) UpdateBlokFall(msg tea.Msg) tea.Cmd {
 	var (
-		cmd       tea.Cmd
-		cmds      []tea.Cmd
+		cmd         tea.Cmd
+		cmds        []tea.Cmd
 		blokfallMsg = msg
 	)
 
@@ -110,6 +110,6 @@ func (m *MPModel) blokfallView() MPView {
 	// TODO: players list
 	inputs := ""
 	v := m.blokfall.View()
-	v = lipgloss.JoinHorizontal(lipgloss.Top, inputs, v)
-	return MPView(&v)
+	content := lipgloss.JoinHorizontal(lipgloss.Top, inputs, v.Content)
+	return MPView(&content)
 }
