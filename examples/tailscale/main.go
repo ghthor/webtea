@@ -41,7 +41,7 @@ func main() {
 	ctx, sigCancel := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 	defer sigCancel()
 
-	ts, err := tshelper.NewListeners("webtea", sshPort, httpPort)
+	ts, err := tshelper.NewListeners(tshelper.NewServer("webtea"), sshPort, httpPort)
 	if err != nil {
 		log.Fatal("tailscale %w", err)
 	}

@@ -74,7 +74,10 @@ func main() {
 		log.Fatal("could not start main program", "error", err)
 	}
 
-	ts, err := tshelper.NewListeners(hostname, sshPort, httpPort)
+	ts, err := tshelper.NewListeners(
+		tshelper.NewServer(hostname),
+		sshPort, httpPort,
+	)
 	if err != nil {
 		log.Fatal("tailscale %w", err)
 	}

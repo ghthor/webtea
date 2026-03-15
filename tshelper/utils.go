@@ -14,24 +14,29 @@ import (
 )
 
 type Listeners struct {
-	ts *tsnet.Server
+	Server *tsnet.Server
 
 	Ssh, Http net.Listener
 
 	Client *local.Client
 }
 
-func NewListeners(hostname string, sshPort, httpPort int) (Listeners, error) {
-	l := Listeners{}
-	l.ts = new(tsnet.Server)
-	l.ts.Hostname = hostname
+func NewServer(hostname string) *tsnet.Server {
+	return &tsnet.Server{
+		Hostname: hostname,
+	}
+}
 
-	err := l.ts.Start()
+func NewListeners(ts *tsnet.Server, sshPort, httpPort int) (Listeners, error) {
+	l := Listeners{}
+	l.Server = ts
+
+	err := l.Server.Start()
 	if err != nil {
 		return l, fmt.Errorf("tsnet.Server failed to start: %w", err)
 	}
 
-	l.Ssh, err = l.ts.Listen("tcp", net.JoinHostPort("", fmt.Sprint(sshPort)))
+	l.Ssh, err = l.Server.Listen("tcp", net.JoinHostPort("", fmt.Sprint(sshPort)))
 	if err != nil {
 		return l, errors.Join(
 			fmt.Errorf("failed to start ssh listener: %w", err),
@@ -39,7 +44,7 @@ func NewListeners(hostname string, sshPort, httpPort int) (Listeners, error) {
 		)
 	}
 
-	l.Http, err = l.ts.Listen("tcp", net.JoinHostPort("", fmt.Sprint(httpPort)))
+	l.Http, err = l.Server.Listen("tcp", net.JoinHostPort("", fmt.Sprint(httpPort)))
 	if err != nil {
 		return l, errors.Join(
 			fmt.Errorf("failed to start http listener: %w", err),
@@ -47,7 +52,7 @@ func NewListeners(hostname string, sshPort, httpPort int) (Listeners, error) {
 		)
 	}
 
-	l.Client, err = l.ts.LocalClient()
+	l.Client, err = l.Server.LocalClient()
 	if err != nil {
 		return l, errors.Join(
 			fmt.Errorf("failed to create tsnet LocalClient(): %w", err),
@@ -71,7 +76,7 @@ func (l Listeners) WaitForTailscaleIP(ctx context.Context) (v4, v6 netip.Addr, e
 			return v4, v6, ctx.Err()
 
 		case <-t.C:
-			v4, v6 = l.ts.TailscaleIPs()
+			v4, v6 = l.Server.TailscaleIPs()
 			if v4.IsValid() {
 				return v4, v6, nil
 			}
@@ -88,8 +93,8 @@ func (l Listeners) Close() error {
 	if l.Http != nil {
 		errs = append(errs, l.Http.Close())
 	}
-	if l.ts != nil {
-		errs = append(errs, l.ts.Close())
+	if l.Server != nil {
+		errs = append(errs, l.Server.Close())
 	}
 
 	return errors.Join(errs...)
