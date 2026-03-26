@@ -64,6 +64,10 @@ func NewListeners(ts *tsnet.Server, sshPort, httpPort int) (Listeners, error) {
 }
 
 func (l Listeners) WaitForTailscaleIP(ctx context.Context) (v4, v6 netip.Addr, err error) {
+	return WaitForTailscaleIP(ctx, l.Server)
+}
+
+func WaitForTailscaleIP(ctx context.Context, ts *tsnet.Server) (v4, v6 netip.Addr, err error) {
 	var (
 		t    = time.NewTicker(time.Second)
 		done = ctx.Done()
@@ -76,7 +80,7 @@ func (l Listeners) WaitForTailscaleIP(ctx context.Context) (v4, v6 netip.Addr, e
 			return v4, v6, ctx.Err()
 
 		case <-t.C:
-			v4, v6 = l.Server.TailscaleIPs()
+			v4, v6 = ts.TailscaleIPs()
 			if v4.IsValid() {
 				return v4, v6, nil
 			}
