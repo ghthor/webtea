@@ -41,7 +41,19 @@ func ShutdownSSH(s *ssh.Server, timeout time.Duration) error {
 	return nil
 }
 
-func RunHTTP(ctx context.Context, grp *errgroup.Group, cancel context.CancelCauseFunc, l net.Listener, fact server.Factory, hostname string) error {
+// TODO: move this into gotty
+type GoTTYServerOption func(*server.Options)
+
+// TODO: move this into gotty
+func WithTLSConfig(crtFile, keyFile string) GoTTYServerOption {
+	return func(o *server.Options) {
+		o.EnableTLS = true
+		o.TLSCrtFile = crtFile
+		o.TLSKeyFile = keyFile
+	}
+}
+
+func RunHTTP(ctx context.Context, grp *errgroup.Group, cancel context.CancelCauseFunc, l net.Listener, fact server.Factory, hostname string, opts ...GoTTYServerOption) error {
 	var (
 		err        error
 		appOptions = &server.Options{}
@@ -59,6 +71,10 @@ func RunHTTP(ctx context.Context, grp *errgroup.Group, cancel context.CancelCaus
 	appOptions.TitleFormat = "{{ .hostname }}"
 	appOptions.TitleVariables = map[string]any{
 		"hostname": hostname,
+	}
+
+	for _, opt := range opts {
+		opt(appOptions)
 	}
 
 	if err = appOptions.Validate(); err != nil {
